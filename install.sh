@@ -20,7 +20,7 @@ git clone https://git.suckless.org/st st
 cd st
 make
 rm config.h
-cp ../config.h .
+wget https://raw.githubusercontent.com/paperbenni/suckless-terminal/master/config.h
 make
 sudo make install
 cd ~
