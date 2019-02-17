@@ -15,6 +15,7 @@ cd ~/.local/share/fonts
 wget https://github.com/todylu/monaco.ttf/raw/master/monaco.ttf
 cd ~
 
+rm -rf st
 git clone https://git.suckless.org/st st
 cd st
 make
