@@ -97,6 +97,11 @@ typedef struct {
 	Draw draw;
 	Visual *vis;
 	XSetWindowAttributes attrs;
+	/* Here, we use the term *pointer* to differentiate the cursor
+	 * one sees when hovering the mouse over the terminal from, e.g.,
+	 * a green rectangle where text would be entered. */
+	Cursor vpointer, bpointer; /* visible and hidden pointers */
+	int pointerisvisible;
 	int scr;
 	int isfixed; /* is fixed geometry? */
 	int l, t; /* left and top offset */
@@ -657,6 +662,13 @@ brelease(XEvent *e)
 void
 bmotion(XEvent *e)
 {
+	if (!xw.pointerisvisible) {
+		XDefineCursor(xw.dpy, xw.win, xw.vpointer);
+		xw.pointerisvisible = 1;
+		if (!IS_SET(MODE_MOUSEMANY))
+			xsetpointermotion(0);
+	}
+
 	if (IS_SET(MODE_MOUSE) && !(e->xbutton.state & forceselmod)) {
 		mousereport(e);
 		return;
@@ -1044,10 +1056,10 @@ void
 xinit(int cols, int rows)
 {
 	XGCValues gcvalues;
-	Cursor cursor;
 	Window parent;
 	pid_t thispid = getpid();
 	XColor xmousefg, xmousebg;
+	Pixmap blankpm;
 
 	if (!(xw.dpy = XOpenDisplay(NULL)))
 		die("can't open display\n");
@@ -1108,8 +1120,9 @@ xinit(int cols, int rows)
 	ximopen(xw.dpy);
 
 	/* white cursor, black outline */
-	cursor = XCreateFontCursor(xw.dpy, mouseshape);
-	XDefineCursor(xw.dpy, xw.win, cursor);
+	xw.pointerisvisible = 1;
+	xw.vpointer = XCreateFontCursor(xw.dpy, mouseshape);
+	XDefineCursor(xw.dpy, xw.win, xw.vpointer);
 
 	if (XParseColor(xw.dpy, xw.cmap, colorname[mousefg], &xmousefg) == 0) {
 		xmousefg.red   = 0xffff;
@@ -1123,7 +1136,10 @@ xinit(int cols, int rows)
 		xmousebg.blue  = 0x0000;
 	}
 
-	XRecolorCursor(xw.dpy, cursor, &xmousefg, &xmousebg);
+	XRecolorCursor(xw.dpy, xw.vpointer, &xmousefg, &xmousebg);
+	blankpm = XCreateBitmapFromData(xw.dpy, xw.win, &(char){0}, 1, 1);
+	xw.bpointer = XCreatePixmapCursor(xw.dpy, blankpm, blankpm,
+					  &xmousefg, &xmousebg, 0, 0);
 
 	xw.xembed = XInternAtom(xw.dpy, "_XEMBED", False);
 	xw.wmdeletewin = XInternAtom(xw.dpy, "WM_DELETE_WINDOW", False);
@@ -1613,6 +1629,8 @@ unmap(XEvent *ev)
 void
 xsetpointermotion(int set)
 {
+	if (!set && !xw.pointerisvisible)
+		return;
 	MODBIT(xw.attrs.event_mask, set, PointerMotionMask);
 	XChangeWindowAttributes(xw.dpy, xw.win, CWEventMask, &xw.attrs);
 }
@@ -1730,6 +1748,12 @@ kpress(XEvent *ev)
 	Rune c;
 	Status status;
 	Shortcut *bp;
+
+	if (xw.pointerisvisible) {
+		XDefineCursor(xw.dpy, xw.win, xw.bpointer);
+		xsetpointermotion(1);
+		xw.pointerisvisible = 0;
+	}
 
 	if (IS_SET(MODE_KBDLOCK))
 		return;
