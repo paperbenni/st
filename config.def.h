@@ -86,37 +86,38 @@ unsigned int tabspaces = 8;
 static const char *colorname[] = {
 
 
-	"#282936", /* base00 */
-	"#ea51b2", /* base08 */
-	"#ebff87", /* base0B */
-	"#00f769", /* base0A */
-	"#62d6e8", /* base0D */
-	"#b45bcf", /* base0E */
-	"#a1efe4", /* base0C */
-	"#e9e9f4", /* base05 */
-	"#626483", /* base03 */
-	"#b45bcf", /* base09 */
-	"#3a3c4e", /* base01 */
-	"#4d4f68", /* base02 */
-	"#62d6e8", /* base04 */
-	"#f1f2f8", /* base06 */
-	"#00f769", /* base0F */
-  	"#f7f7fb", /* base07 */
-	[255] = 0,
+  /* 8 normal colors */
+  [0] = "#000000", /* black   */
+  [1] = "#ff5555", /* red     */
+  [2] = "#50fa7b", /* green   */
+  [3] = "#f1fa8c", /* yellow  */
+  [4] = "#bd93f9", /* blue    */
+  [5] = "#ff79c6", /* magenta */
+  [6] = "#8be9fd", /* cyan    */
+  [7] = "#bbbbbb", /* white   */
 
-	/* more colors can be added after 255 to use with DefaultXX */
-	"#cccccc",
-	"#555555",
+  /* 8 bright colors */
+  [8]  = "#44475a", /* black   */
+  [9]  = "#ff5555", /* red     */
+  [10] = "#50fa7b", /* green   */
+  [11] = "#f1fa8c", /* yellow  */
+  [12] = "#bd93f9", /* blue    */
+  [13] = "#ff79c6", /* magenta */
+  [14] = "#8be9fd", /* cyan    */
+  [15] = "#ffffff", /* white   */
+
+  /* special colors */
+  [256] = "#282a36", /* background */
+  [257] = "#f8f8f2", /* foreground */
 };
-
 
 /*
  * Default colors (colorname index)
  * foreground, background, cursor, reverse cursor
  */
-unsigned int defaultfg = 7;
-unsigned int defaultbg = 0;
-static unsigned int defaultcs = 256;
+unsigned int defaultfg = 257;
+unsigned int defaultbg = 256;
+unsigned int defaultcs = 257;
 static unsigned int defaultrcs = 257;
 
 /*
@@ -126,7 +127,7 @@ static unsigned int defaultrcs = 257;
  * 6: Bar ("|")
  * 7: Snowman ("☃")
  */
-static unsigned int cursorshape = 2;
+static unsigned int cursorshape = 6;
 
 /*
  * Default columns and rows numbers
