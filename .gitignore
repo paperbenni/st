@@ -2,3 +2,4 @@ st
 st.o
 x.o
 config.h
+*.tar.gz
