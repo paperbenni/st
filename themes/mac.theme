@@ -1,5 +1,6 @@
 
-static char *font = "Monaco:pixelsize=17:antialias=true:autohint=true";
+static char *font = "SF-Mono-Regular:pixelsize=17:antialias=true:autohint=true";
+  # this is solarized
   
   /* 8 normal colors */
   [0] = "#000000", /* black   */

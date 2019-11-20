@@ -19,3 +19,4 @@ replacetheme 'r \*font'
 make clean
 rm config.h &>/dev/null
 make
+sudo make install
