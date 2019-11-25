@@ -85,6 +85,8 @@ typedef struct {
 	int cw; /* char width  */
 	int mode; /* window state/mode flags */
 	int cursor; /* cursor style */
+	int vbellset; /* 1 during visual bell, 0 otherwise */
+	struct timespec lastvbell;
 } TermWindow;
 
 typedef struct {
@@ -179,6 +181,9 @@ static void mousesel(XEvent *, int);
 static void mousereport(XEvent *);
 static char *kmap(KeySym, uint);
 static int match(uint, uint);
+
+static void vbellbegin();
+static int isvbellcell(int x, int y);
 
 static void run(void);
 static void usage(void);
@@ -1572,6 +1577,8 @@ xdrawline(Line line, int x1, int y1, int x2)
 			continue;
 		if (selected(x, y1))
 			new.mode ^= ATTR_REVERSE;
+		if (win.vbellset && isvbellcell(x, y1))
+			new.mode ^= ATTR_REVERSE;
 		if (i > 0 && ATTRCMP(base, new)) {
 			xdrawglyphfontspecs(specs, base, i, ox, y1);
 			specs += i;
@@ -1664,6 +1671,28 @@ xseturgency(int add)
 	XFree(h);
 }
 
+int
+isvbellcell(int x, int y)
+{
+	if (vbellmode == 1)
+		return 1;
+	if (vbellmode == 2)
+		return y == 0 || y == win.th / win.ch - 1 ||
+		       x == 0 || x == win.tw / win.cw - 1;
+	return 0;
+}
+
+void
+vbellbegin() {
+	clock_gettime(CLOCK_MONOTONIC, &win.lastvbell);
+	if (win.vbellset) /* already visible, just extend win.lastvbell */
+		return;
+	win.vbellset = 1;
+	tfulldirt();
+	draw();
+	XFlush(xw.dpy);
+}
+
 void
 xbell(void)
 {
@@ -1671,6 +1700,8 @@ xbell(void)
 		xseturgency(1);
 	if (bellvolume)
 		XkbBell(xw.dpy, xw.win, bellvolume, (Atom)NULL);
+	if (vbelltimeout)
+		vbellbegin();
 }
 
 void
@@ -1823,7 +1854,7 @@ run(void)
 	int xfd = XConnectionNumber(xw.dpy), xev, blinkset = 0, dodraw = 0;
 	int ttyfd;
 	struct timespec drawtimeout, *tv = NULL, now, last, lastblink;
-	long deltatime;
+	long deltatime, to_ms, remain;
 
 	/* Waiting for window mapping */
 	do {
@@ -1875,11 +1906,28 @@ run(void)
 		tv = &drawtimeout;
 
 		dodraw = 0;
-		if (blinktimeout && TIMEDIFF(now, lastblink) > blinktimeout) {
-			tsetdirtattr(ATTR_BLINK);
-			win.mode ^= MODE_BLINK;
-			lastblink = now;
-			dodraw = 1;
+		to_ms = -1; /* timeout in ms, indefinite if negative */
+		if (blinkset) {
+			remain = blinktimeout - TIMEDIFF(now, lastblink);
+			if (remain <= 0) {
+				dodraw = 1;
+				remain = 1; /* draw, wait 1ms, and re-calc */
+				tsetdirtattr(ATTR_BLINK);
+				win.mode ^= MODE_BLINK;
+				lastblink = now;
+			}
+			to_ms = remain;
+		}
+		if (win.vbellset) {
+			remain = vbelltimeout - TIMEDIFF(now, win.lastvbell);
+			if (remain <= 0) {
+				dodraw = 1;
+				remain = -1; /* draw (clear), and that's it */
+				tfulldirt();
+				win.vbellset = 0;
+			}
+			if (remain >= 0 && (to_ms < 0 || remain < to_ms))
+				to_ms = remain;
 		}
 		deltatime = TIMEDIFF(now, last);
 		if (deltatime > 1000 / (xev ? xfps : actionfps)) {
@@ -1902,19 +1950,10 @@ run(void)
 			if (xev && !FD_ISSET(xfd, &rfd))
 				xev--;
 			if (!FD_ISSET(ttyfd, &rfd) && !FD_ISSET(xfd, &rfd)) {
-				if (blinkset) {
-					if (TIMEDIFF(now, lastblink) \
-							> blinktimeout) {
-						drawtimeout.tv_nsec = 1000;
-					} else {
-						drawtimeout.tv_nsec = (1E6 * \
-							(blinktimeout - \
-							TIMEDIFF(now,
-								lastblink)));
-					}
-					drawtimeout.tv_sec = \
-					    drawtimeout.tv_nsec / 1E9;
-					drawtimeout.tv_nsec %= (long)1E9;
+				if (to_ms >= 0) {
+					static const long k = 1E3, m = 1E6;
+					drawtimeout.tv_sec = to_ms / k;
+					drawtimeout.tv_nsec = (to_ms % k) * m;
 				} else {
 					tv = NULL;
 				}

@@ -5,7 +5,7 @@
  *
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
-static char *font = "Liberation Mono:pixelsize=12:antialias=true:autohint=true";
+static char *font = "Source Code Pro:pixelsize=17:antialias=true:autohint=true";
 static int borderpx = 2;
 
 /*
@@ -60,7 +60,18 @@ static unsigned int cursorthickness = 2;
  * bell volume. It must be a value between -100 and 100. Use 0 for disabling
  * it
  */
-static int bellvolume = 0;
+static int bellvolume = 30;
+
+/*
+ * visual-bell timeout (set to 0 to disable visual-bell).
+ */
+static int vbelltimeout = 70;
+/*
+ * visual bell mode when enabled:
+ *   1: Inverse whole screen
+ *   2: Inverse outer (border) cells
+ */
+static int vbellmode = 1;
 
 /* default TERM value */
 char *termname = "st-256color";
@@ -86,28 +97,28 @@ unsigned int tabspaces = 8;
 static const char *colorname[] = {
 
   /* 8 normal colors */
-  [0] = "#000000", /* black   */
-  [1] = "#ff5555", /* red     */
-  [2] = "#50fa7b", /* green   */
-  [3] = "#f1fa8c", /* yellow  */
-  [4] = "#bd93f9", /* blue    */
-  [5] = "#ff79c6", /* magenta */
-  [6] = "#8be9fd", /* cyan    */
-  [7] = "#bbbbbb", /* white   */
+  [0] = "#3B4252", /* black   */
+  [1] = "#BF616A", /* red     */
+  [2] = "#A3BE8C", /* green   */
+  [3] = "#EBCB8B", /* yellow  */
+  [4] = "#81A1C1", /* blue    */
+  [5] = "#B48EAD", /* magenta */
+  [6] = "#88C0D0", /* cyan    */
+  [7] = "#E5E9F0", /* white   */
 
   /* 8 bright colors */
-  [8]  = "#44475a", /* black   */
-  [9]  = "#ff5555", /* red     */
-  [10] = "#50fa7b", /* green   */
-  [11] = "#f1fa8c", /* yellow  */
-  [12] = "#bd93f9", /* blue    */
-  [13] = "#ff79c6", /* magenta */
-  [14] = "#8be9fd", /* cyan    */
-  [15] = "#ffffff", /* white   */
+  [8]  = "#4C566A", /* black   */
+  [9]  = "#BF616A", /* red     */
+  [10] = "#A3BE8C", /* green   */
+  [11] = "#EBCB8B", /* yellow  */
+  [12] = "#81A1C1", /* blue    */
+  [13] = "#B48EAD", /* magenta */
+  [14] = "#8FBCBB", /* cyan    */
+  [15] = "#ECEFF4", /* white   */
 
   /* special colors */
-  [256] = "#282a36", /* background */
-  [257] = "#f8f8f2", /* foreground */
+  [256] = "#2E3440", /* background */
+  [257] = "#D8DEE9", /* foreground */
 };
 
 /*
