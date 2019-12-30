@@ -23,5 +23,5 @@ static char *font = "SF Mono-Regular:pixelsize=17:antialias=true:autohint=true";
   [15] = "#fdf6e3", /* white   */
 
   /* special colors */
-  [256] = "#282A36", /* background */
-  [257] = "#F8F8F2", /* foreground */
+  [256] = "#002B36", /* background */
+  [257] = "#839496", /* foreground */
