@@ -1,4 +1,4 @@
-static char *font = "Monaco:pixelsize=17:antialias=true:autohint=true";
+static char *font = "Monaco Nerd Font Mono:pixelsize=17:antialias=true:autohint=true";
 
   /* 8 normal colors */
   [0] = "#000000", /* black   */
