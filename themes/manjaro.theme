@@ -2,25 +2,25 @@
 static char *font = "Source Code Pro:pixelsize=17:antialias=true:autohint=true";
   
   /* 8 normal colors */
-  [0] = "#3B4252", /* black   */
-  [1] = "#BF616A", /* red     */
-  [2] = "#A3BE8C", /* green   */
-  [3] = "#EBCB8B", /* yellow  */
-  [4] = "#81A1C1", /* blue    */
-  [5] = "#B48EAD", /* magenta */
-  [6] = "#88C0D0", /* cyan    */
-  [7] = "#E5E9F0", /* white   */
+  [0] = "#1B1D1E", /* black   */
+  [1] = "#F92672", /* red     */
+  [2] = "#82B414", /* green   */
+  [3] = "#FD971F", /* yellow  */
+  [4] = "#56C2D6", /* blue    */
+  [5] = "#8C54FE", /* magenta */
+  [6] = "#465457", /* cyan    */
+  [7] = "#CCCCC6", /* white   */
 
   /* 8 bright colors */
-  [8]  = "#4C566A", /* black   */
-  [9]  = "#BF616A", /* red     */
-  [10] = "#A3BE8C", /* green   */
-  [11] = "#EBCB8B", /* yellow  */
-  [12] = "#81A1C1", /* blue    */
-  [13] = "#B48EAD", /* magenta */
-  [14] = "#8FBCBB", /* cyan    */
-  [15] = "#ECEFF4", /* white   */
+  [8]  = "#505354", /* black   */
+  [9]  = "#FF5995", /* red     */
+  [10] = "#B6E354", /* green   */
+  [11] = "#FEED6C", /* yellow  */
+  [12] = "#8CEDFF", /* blue    */
+  [13] = "#9E6FFE", /* magenta */
+  [14] = "#899CA1", /* cyan    */
+  [15] = "#F8F8F2", /* white   */
 
   /* special colors */
-  [256] = "#2E3440", /* background */
+  [256] = "#1C1C1C", /* background */
   [257] = "#D8DEE9", /* foreground */
